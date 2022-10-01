@@ -66,6 +66,7 @@ TEMPLATES = [
     },
 ]
 
+AUTH_USER_MODEL = "social_app.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [],
