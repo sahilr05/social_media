@@ -88,6 +88,10 @@ WSGI_APPLICATION = "reunion.wsgi.application"
 #     }
 # }
 
+SIMPLE_JWT = {
+    'USER_ID_FIELD': 'user_id',
+}
+
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.sqlite3",
