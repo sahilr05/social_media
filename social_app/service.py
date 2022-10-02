@@ -62,6 +62,10 @@ def delete_post(*, user: User, post_id: uuid) -> None:
     post.save()
 
 
+def post_detail(*, user: User, post_id: uuid) -> None:
+    return _get_post(post_id=post_id)
+
+
 @transaction.atomic
 def like_post(*, user: User, post_id: uuid) -> None:
     post = _get_post(post_id=post_id)

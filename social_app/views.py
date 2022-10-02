@@ -99,8 +99,20 @@ class CreatePostAPI(APIView):
         return Response(data=response_data, status=status.HTTP_201_CREATED)
 
 
-class DeletePostAPI(APIView):
+class PostAPI(APIView):
+    class OutputSerializer(serializers.ModelSerializer):
+        like_count = serializers.ReadOnlyField()
+
+        class Meta:
+            model = Post
+            fields = "__all__"
+
     permission_classes = (IsAuthenticated,)
+
+    def get(self, request, id):
+        post = service.post_detail(user=request.user, post_id=id)
+        response_data = self.OutputSerializer(post).data
+        return Response(data=response_data, status=status.HTTP_200_OK)
 
     def delete(self, request, id):
         service.delete_post(user=request.user, post_id=id)

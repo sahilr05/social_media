@@ -108,6 +108,10 @@ class Post(BaseModel):
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
 
+    @property
+    def like_count(self):
+        return Like.objects.filter(post_id=self.post_id).count()
+
 
 class Like(BaseModel):
     like_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -121,14 +125,6 @@ class Like(BaseModel):
         on_delete=models.CASCADE,
         related_name="like_post",
     )
-
-    @property
-    def like_count(self):
-        return self.filter(post_id=self.post_id).count()
-
-    @property
-    def liked_by_users(self):
-        return User.objects.filter(like__post_id=self.post_id)
 
 
 class Comment(BaseModel):
@@ -144,7 +140,3 @@ class Comment(BaseModel):
         related_name="comment_post",
     )
     message = models.TextField(blank=True, null=True)
-
-    @property
-    def comment_count(self):
-        return self.filter(post_id=self.post_id).count()
