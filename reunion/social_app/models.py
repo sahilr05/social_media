@@ -1,9 +1,9 @@
-from enum import unique
 from django.db import models
+from django.apps import apps
 from django.contrib.auth.models import AbstractUser
 
 import uuid
-# Create your models here.
+
 
 class BaseModel(models.Model):
     created_datetime = models.DateTimeField(auto_now_add=True)
@@ -46,3 +46,84 @@ class User(AbstractUser):
     username = models.CharField(max_length=100, unique=True, null=True, blank=True)
     password = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
+
+    @property
+    def follower_count(self):
+        follow = apps.get_model("social_app", "Follow")
+        return follow.filter(user_id=self.user_id).count()
+
+    @property
+    def following_count(self):
+        follow = apps.get_model("social_app", "Follow")
+        return follow.filter(follower_id=self.user_id).count()
+
+
+class Follow(BaseModel):
+    follow_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        to="social_app.User",
+        on_delete=models.CASCADE,
+        related_name="main_user",
+    )
+    follower = models.ForeignKey(
+        to="social_app.User",
+        on_delete=models.CASCADE,
+        related_name="follower",
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user_id','follower'],  name="unique_followers")
+        ]
+
+
+class Post(BaseModel):
+    post_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name="post_user",
+    )
+    title = models.CharField(max_length=100)
+    body = models.TextField(blank=True, null=True)
+
+
+class Like(BaseModel):
+    like_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name="like_user",
+    )
+    post = models.ForeignKey(
+        to=Post,
+        on_delete=models.CASCADE,
+        related_name="like_post",
+    )
+
+    @property
+    def like_count(self):
+        return self.filter(post_id=self.post_id).count()
+
+    @property
+    def liked_by_users(self):
+        return User.objects.filter(like__post_id=self.post_id)
+
+
+class Comment(BaseModel):
+    comment_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name="comment_user",
+    )
+    post = models.ForeignKey(
+        to=Post,
+        on_delete=models.CASCADE,
+        related_name="comment_post",
+    )
+    message = models.TextField(blank=True, null=True)
+
+    @property
+    def comment_count(self):
+        return self.filter(post_id=self.post_id).count()
