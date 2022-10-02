@@ -31,17 +31,11 @@ class UserSignUpAPI(APIView):
         first_name = serializers.CharField()
         last_name = serializers.CharField()
 
-    class OutputSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = User
-            fields = "__all__"
-
     def post(self, request):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = service.user_signup(**serializer.validated_data)
-        response_data = self.OutputSerializer(user).data
-        return Response(data=response_data, status=status.HTTP_201_CREATED)
+        service.user_signup(**serializer.validated_data)
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class UserDetailAPI(APIView):

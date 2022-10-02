@@ -83,23 +83,17 @@ SIMPLE_JWT = {
 WSGI_APPLICATION = "reunion.wsgi.application"
 
 # postgres://user:pass@localhost/dbname
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": env("SQL_DATABASE"),
-#         "USER": env("SQL_USER"),
-#         "PASSWORD": env("SQL_PASSWORD"),
-#         "HOST": env("SQL_HOST"),
-#         "PORT": 5432,
-#     }
-# }
-
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR + "/" + "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env("SQL_DATABASE"),
+        "USER": env("SQL_USER"),
+        "PASSWORD": env("SQL_PASSWORD"),
+        "HOST": env("SQL_HOST"),
+        "PORT": 5432,
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
