@@ -1,6 +1,7 @@
 import uuid
 
 from django.contrib.auth.hashers import make_password
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.utils import timezone
 
@@ -52,8 +53,16 @@ def create_post(*, user: User, title: str, description: str) -> Post:
     return post
 
 
+@transaction.atomic
+def delete_post(*, user: User, post_id: uuid) -> None:
+    post = _validate_and_get_post(user=user, post_id=post_id)
+    post.deleted_by_user = user
+    post.deleted_datetime = timezone.now()
+    post.save()
+
+
 def _get_follow_obj(*, user: User, follower: User) -> Follow:
-    return Follow.objects.get(
+    return Follow.objects.select_for_update().get(
         user=user, follower=follower, deleted_datetime__isnull=True
     )
 
@@ -80,6 +89,15 @@ def _validate_unfollow_request(*, user: User, follower: User) -> None:
         user=user, follower=follower, deleted_datetime__isnull=True
     ).exists():
         raise ValidationException(f"You're not following {follower.name}")
+
+
+def _validate_and_get_post(*, user: User, post_id: uuid) -> Post:
+    post = Post.objects.select_for_update().get(
+        post_id=post_id, deleted_datetime__isnull=True
+    )
+    if post.created_by_user != user:
+        raise PermissionDenied
+    return post
 
 
 def _save_follow_request(*, user: User, follower: User) -> None:

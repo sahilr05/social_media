@@ -97,3 +97,11 @@ class CreatePostAPI(APIView):
         post = service.create_post(user=request.user, **serializer.validated_data)
         response_data = self.OutputSerializer(post).data
         return Response(data=response_data, status=status.HTTP_201_CREATED)
+
+
+class DeletePostAPI(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def delete(self, request, id):
+        service.delete_post(user=request.user, post_id=id)
+        return Response(status=status.HTTP_204_NO_CONTENT)

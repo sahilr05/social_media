@@ -44,6 +44,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+MIDDLEWARE += ("crum.CurrentRequestUserMiddleware",)
 
 ROOT_URLCONF = "reunion.urls"
 

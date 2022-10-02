@@ -1,5 +1,6 @@
 import uuid
 
+from crum import get_current_user
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -32,7 +33,12 @@ class BaseModel(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        self.full_clean()
+        user = get_current_user()
+        if user and not user.pk:
+            user = None
+        if not self.created_by_user:
+            self.created_by_user = user
+        self.modified_by_user = user
         super(BaseModel, self).save(*args, **kwargs)
 
     class Meta:

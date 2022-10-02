@@ -18,7 +18,8 @@ follow_urls = [
 ]
 
 post_urls = [
-    path("post/", views.CreatePostAPI().as_view(), name="create_post"),
+    path("posts/", views.CreatePostAPI().as_view(), name="create_post"),
+    path("posts/<uuid:id>/", views.DeletePostAPI().as_view(), name="delete_post"),
 ]
 
 urlpatterns.extend(user_urls + follow_urls + post_urls)
