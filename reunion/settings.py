@@ -1,7 +1,7 @@
 import os
 import sys
 from pathlib import Path
-
+from datetime import timedelta
 import environ
 
 # Initialise environment variables
@@ -10,11 +10,7 @@ environ.Env.read_env()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-sys.path.insert(
-    0, os.path.join(BASE_DIR, "reunion")
-)  # Required for discovering apps under reunion
-
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
@@ -34,7 +30,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_extensions",
     "rest_framework",
+    "rest_framework_simplejwt",
     "social_app",
 ]
 
@@ -69,9 +67,15 @@ TEMPLATES = [
 AUTH_USER_MODEL = "social_app.User"
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [],
+    "DEFAULT_AUTHENTICATION_CLASSES": ['rest_framework_simplejwt.authentication.JWTAuthentication',],
     "DEFAULT_PERMISSION_CLASSES": [],
     "EXCEPTION_HANDLER": "reunion.exception-handler.custom_exception_handler",
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=20),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "USER_ID_FIELD": "user_id",
 }
 
 WSGI_APPLICATION = "reunion.wsgi.application"
@@ -88,14 +92,10 @@ WSGI_APPLICATION = "reunion.wsgi.application"
 #     }
 # }
 
-SIMPLE_JWT = {
-    'USER_ID_FIELD': 'user_id',
-}
-
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / 'db.sqlite3',
+        "NAME": BASE_DIR + '/' + 'db.sqlite3',
     }
 }
 

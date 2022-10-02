@@ -47,6 +47,13 @@ class User(AbstractUser):
     password = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
 
+    def __str__(self):
+        return self.first_name + " " + self.last_name
+
+    @property
+    def name(self):
+        return f"{self.first_name} {self.last_name}"
+
     @property
     def follower_count(self):
         follow = apps.get_model("social_app", "Follow")
@@ -73,9 +80,11 @@ class Follow(BaseModel):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user_id','follower'],  name="unique_followers")
+            models.UniqueConstraint(fields=['user_id','follower'],  condition=models.Q(deleted_datetime=None), name="unique_followers")
         ]
 
+    def __str__(self):
+        return f"{self.user.first_name} is following {self.follower.first_name}"
 
 class Post(BaseModel):
     post_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
