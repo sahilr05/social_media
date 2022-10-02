@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from reunion.exception import ValidationException
 from social_app.models import Follow
+from social_app.models import Like
 from social_app.models import Post
 from social_app.models import User
 
@@ -61,10 +62,27 @@ def delete_post(*, user: User, post_id: uuid) -> None:
     post.save()
 
 
+@transaction.atomic
+def like_post(*, user: User, post_id: uuid) -> None:
+    post = _get_post(post_id=post_id)
+    _validate_post_like(user=user, post=post)
+    _save_post_like(user=user, post=post)
+
+
+@transaction.atomic
+def unlike_post(*, user: User, post_id: uuid) -> None:
+    post = _get_post(post_id=post_id)
+    Like.objects.filter(user=user, post=post).delete()
+
+
 def _get_follow_obj(*, user: User, follower: User) -> Follow:
     return Follow.objects.select_for_update().get(
         user=user, follower=follower, deleted_datetime__isnull=True
     )
+
+
+def _get_post(*, post_id: uuid) -> Post:
+    return Post.objects.get(post_id=post_id, deleted_datetime__isnull=True)
 
 
 def _valdiate_and_get_user(*, id: uuid) -> User:
@@ -100,8 +118,20 @@ def _validate_and_get_post(*, user: User, post_id: uuid) -> Post:
     return post
 
 
+def _validate_post_like(*, user: User, post: Post) -> None:
+    if Like.objects.filter(user=user, post=post).exists():
+        raise ValidationException(f"You've already liked this post")
+
+
 def _save_follow_request(*, user: User, follower: User) -> None:
     follow = Follow()
     follow.user = user
     follow.follower = follower
     follow.save()
+
+
+def _save_post_like(*, user: User, post: Post) -> None:
+    like = Like()
+    like.user = user
+    like.post = post
+    like.save()

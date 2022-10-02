@@ -105,3 +105,19 @@ class DeletePostAPI(APIView):
     def delete(self, request, id):
         service.delete_post(user=request.user, post_id=id)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class LikePostAPI(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, id):
+        service.like_post(user=request.user, post_id=id)
+        return Response(status=status.HTTP_201_CREATED)
+
+
+class UnlikePostAPI(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, id):
+        service.unlike_post(user=request.user, post_id=id)
+        return Response(status=status.HTTP_204_NO_CONTENT)

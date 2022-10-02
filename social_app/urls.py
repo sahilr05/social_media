@@ -20,6 +20,8 @@ follow_urls = [
 post_urls = [
     path("posts/", views.CreatePostAPI().as_view(), name="create_post"),
     path("posts/<uuid:id>/", views.DeletePostAPI().as_view(), name="delete_post"),
+    path("like/<uuid:id>/", views.LikePostAPI().as_view(), name="like_post"),
+    path("unlike/<uuid:id>/", views.UnlikePostAPI().as_view(), name="unlike_post"),
 ]
 
 urlpatterns.extend(user_urls + follow_urls + post_urls)
