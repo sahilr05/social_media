@@ -25,7 +25,7 @@ def user_signup(*, first_name: str, last_name: str, email: str, password: str) -
     return user
 
 
-def user_detail(*, user: User):
+def user_detail(*, user: User) -> User:
     return user
 
 
@@ -88,7 +88,7 @@ def unlike_post(*, user: User, post_id: uuid) -> None:
 
 
 @transaction.atomic
-def add_comment(*, user: User, post_id: uuid, message: str) -> None:
+def add_comment(*, user: User, post_id: uuid, message: str) -> uuid:
     post = _get_post(post_id=post_id)
     comment_id = _save_post_comment(user=user, post=post, message=message)
     return comment_id
