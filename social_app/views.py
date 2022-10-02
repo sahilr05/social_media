@@ -102,6 +102,7 @@ class CreatePostAPI(APIView):
 class PostAPI(APIView):
     class OutputSerializer(serializers.ModelSerializer):
         like_count = serializers.ReadOnlyField()
+        comment_count = serializers.ReadOnlyField()
 
         class Meta:
             model = Post
@@ -133,3 +134,22 @@ class UnlikePostAPI(APIView):
     def post(self, request, id):
         service.unlike_post(user=request.user, post_id=id)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AddCommentAPI(APIView):
+    class InputSerializer(serializers.Serializer):
+        message = serializers.CharField()
+
+    class OutputSerializer(serializers.Serializer):
+        comment_id = serializers.UUIDField()
+
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, id):
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        comment_id = service.add_comment(
+            user=request.user, post_id=id, **serializer.validated_data
+        )
+        response_data = self.OutputSerializer({"comment_id": comment_id}).data
+        return Response(data=response_data, status=status.HTTP_201_CREATED)

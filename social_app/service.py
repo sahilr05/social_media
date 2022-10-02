@@ -6,6 +6,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from reunion.exception import ValidationException
+from social_app.models import Comment
 from social_app.models import Follow
 from social_app.models import Like
 from social_app.models import Post
@@ -79,6 +80,13 @@ def unlike_post(*, user: User, post_id: uuid) -> None:
     Like.objects.filter(user=user, post=post).delete()
 
 
+@transaction.atomic
+def add_comment(*, user: User, post_id: uuid, message: str) -> None:
+    post = _get_post(post_id=post_id)
+    comment_id = _save_post_comment(user=user, post=post, message=message)
+    return comment_id
+
+
 def _get_follow_obj(*, user: User, follower: User) -> Follow:
     return Follow.objects.select_for_update().get(
         user=user, follower=follower, deleted_datetime__isnull=True
@@ -139,3 +147,13 @@ def _save_post_like(*, user: User, post: Post) -> None:
     like.user = user
     like.post = post
     like.save()
+
+
+def _save_post_comment(*, user: User, post: Post, message: str) -> uuid:
+    comment = Comment()
+    comment_id = uuid.uuid4()
+    comment.user = user
+    comment.post = post
+    comment.message = message
+    comment.save()
+    return comment_id

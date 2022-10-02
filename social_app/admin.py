@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from social_app.models import Comment
 from social_app.models import Follow
 from social_app.models import Post
 from social_app.models import User
@@ -43,3 +44,11 @@ class PostAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Post, PostAdmin)
+
+
+class CommentAdmin(admin.ModelAdmin):
+    ordering: list = ["-created_datetime"]
+    list_display: list = ["comment_id", "user", "post", "created_datetime"]
+
+
+admin.site.register(Comment, CommentAdmin)

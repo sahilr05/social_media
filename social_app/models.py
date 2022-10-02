@@ -108,9 +108,16 @@ class Post(BaseModel):
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
 
+    def __str__(self):
+        return self.title
+
     @property
     def like_count(self):
         return Like.objects.filter(post_id=self.post_id).count()
+
+    @property
+    def comment_count(self):
+        return Comment.objects.filter(post_id=self.post_id).count()
 
 
 class Like(BaseModel):
