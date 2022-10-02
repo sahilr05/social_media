@@ -6,12 +6,12 @@ from django.utils import timezone
 
 from reunion.exception import ValidationException
 from social_app.models import Follow
+from social_app.models import Post
 from social_app.models import User
 
 
 @transaction.atomic
 def user_signup(*, first_name: str, last_name: str, email: str, password: str) -> User:
-
     user = User()
     user.first_name = first_name
     user.last_name = last_name
@@ -36,12 +36,20 @@ def follow_user(*, user: User, follow_user_id: User) -> None:
 def unfollow_user(*, user: User, unfollow_user_id: User) -> None:
     follower = _valdiate_and_get_user(id=unfollow_user_id)
     _validate_unfollow_request(user=user, follower=follower)
-    print("Unfollowing")
     follow_obj = _get_follow_obj(user=user, follower=follower)
     follow_obj.deleted_by_user = user
     follow_obj.deleted_datetime = timezone.now()
-    print(follow_obj.deleted_datetime)
     follow_obj.save()
+
+
+@transaction.atomic
+def create_post(*, user: User, title: str, description: str) -> Post:
+    post = Post()
+    post.user = user
+    post.title = title
+    post.description = description
+    post.save()
+    return post
 
 
 def _get_follow_obj(*, user: User, follower: User) -> Follow:

@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from social_app import service
+from social_app.models import Post
 from social_app.models import User
 
 # Create your views here.
@@ -71,3 +72,28 @@ class UnfollowAPI(APIView):
     def post(self, request, id):
         service.unfollow_user(user=request.user, unfollow_user_id=id)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CreatePostAPI(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    class InputSerializer(serializers.Serializer):
+        title = serializers.CharField()
+        description = serializers.CharField()
+
+    class OutputSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Post
+            fields = [
+                "post_id",
+                "title",
+                "description",
+                "created_datetime",
+            ]
+
+    def post(self, request):
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        post = service.create_post(user=request.user, **serializer.validated_data)
+        response_data = self.OutputSerializer(post).data
+        return Response(data=response_data, status=status.HTTP_201_CREATED)

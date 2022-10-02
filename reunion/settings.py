@@ -1,7 +1,6 @@
 import os
-import sys
-from pathlib import Path
 from datetime import timedelta
+
 import environ
 
 # Initialise environment variables
@@ -67,7 +66,9 @@ TEMPLATES = [
 AUTH_USER_MODEL = "social_app.User"
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": ['rest_framework_simplejwt.authentication.JWTAuthentication',],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
     "DEFAULT_PERMISSION_CLASSES": [],
     "EXCEPTION_HANDLER": "reunion.exception-handler.custom_exception_handler",
 }
@@ -93,9 +94,9 @@ WSGI_APPLICATION = "reunion.wsgi.application"
 # }
 
 DATABASES = {
-    'default': {
+    "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR + '/' + 'db.sqlite3',
+        "NAME": BASE_DIR + "/" + "db.sqlite3",
     }
 }
 

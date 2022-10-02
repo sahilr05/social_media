@@ -100,7 +100,7 @@ class Post(BaseModel):
         related_name="post_user",
     )
     title = models.CharField(max_length=100)
-    body = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
 
 
 class Like(BaseModel):

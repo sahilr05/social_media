@@ -1,5 +1,8 @@
 from django.contrib import admin
-from social_app.models import User, Follow
+
+from social_app.models import Follow
+from social_app.models import User
+
 
 class UserAdmin(admin.ModelAdmin):
     ordering: list = ["-email"]
@@ -12,6 +15,7 @@ class UserAdmin(admin.ModelAdmin):
 
 admin.site.register(User, UserAdmin)
 
+
 class FollowAdmin(admin.ModelAdmin):
     list_display: list = [
         "follow_id",
@@ -20,5 +24,6 @@ class FollowAdmin(admin.ModelAdmin):
         "created_datetime",
         "deleted_datetime",
     ]
+
 
 admin.site.register(Follow, FollowAdmin)
