@@ -1,8 +1,7 @@
-from django.db import models
-from django.apps import apps
-from django.contrib.auth.models import AbstractUser
-
 import uuid
+
+from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 
 class BaseModel(models.Model):
@@ -56,13 +55,15 @@ class User(AbstractUser):
 
     @property
     def follower_count(self):
-        follow = apps.get_model("social_app", "Follow")
-        return follow.filter(user_id=self.user_id).count()
+        return Follow.objects.filter(
+            user_id=self.user_id, deleted_datetime__isnull=True
+        ).count()
 
     @property
     def following_count(self):
-        follow = apps.get_model("social_app", "Follow")
-        return follow.filter(follower_id=self.user_id).count()
+        return Follow.objects.filter(
+            follower_id=self.user_id, deleted_datetime__isnull=True
+        ).count()
 
 
 class Follow(BaseModel):
@@ -80,11 +81,16 @@ class Follow(BaseModel):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user_id','follower'],  condition=models.Q(deleted_datetime=None), name="unique_followers")
+            models.UniqueConstraint(
+                fields=["user_id", "follower"],
+                condition=models.Q(deleted_datetime=None),
+                name="unique_followers",
+            )
         ]
 
     def __str__(self):
         return f"{self.user.first_name} is following {self.follower.first_name}"
+
 
 class Post(BaseModel):
     post_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
