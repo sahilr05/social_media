@@ -18,6 +18,7 @@ follow_urls = [
 ]
 
 post_urls = [
+    path("all_posts/", views.ListPostAPI().as_view(), name="user_posts"),
     path("posts/", views.CreatePostAPI().as_view(), name="create_post"),
     path("posts/<uuid:id>/", views.PostAPI().as_view(), name="post"),
     path("like/<uuid:id>/", views.LikePostAPI().as_view(), name="like_post"),

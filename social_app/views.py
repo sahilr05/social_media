@@ -5,17 +5,23 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from social_app import service
+from social_app.models import Comment
 from social_app.models import Post
 from social_app.models import User
 
 # Create your views here.
 
+# class TestApi(APIView):
+#     permission_classes = (IsAuthenticated,)
 
-class TestApi(APIView):
-    permission_classes = (IsAuthenticated,)
+#     def get(self, request):
+#         return Response(data={"message": "Hello, world!"}, status=status.HTTP_200_OK)
 
-    def get(self, request):
-        return Response(data={"message": "Hello, world!"}, status=status.HTTP_200_OK)
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ["comment_id", "message"]
 
 
 class UserSignUpAPI(APIView):
@@ -118,6 +124,30 @@ class PostAPI(APIView):
     def delete(self, request, id):
         service.delete_post(user=request.user, post_id=id)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ListPostAPI(APIView):
+    class OutputSerializer(serializers.ModelSerializer):
+        like_count = serializers.ReadOnlyField()
+        comments = CommentSerializer(many=True)
+
+        class Meta:
+            model = Post
+            fields = [
+                "post_id",
+                "title",
+                "description",
+                "created_datetime",
+                "comments",
+                "like_count",
+            ]
+
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        posts = service.list_post_by_user(user=request.user)
+        response_data = self.OutputSerializer(posts, many=True).data
+        return Response(data=response_data, status=status.HTTP_200_OK)
 
 
 class LikePostAPI(APIView):

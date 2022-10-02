@@ -117,7 +117,15 @@ class Post(BaseModel):
 
     @property
     def comment_count(self):
-        return Comment.objects.filter(post_id=self.post_id).count()
+        return Comment.objects.filter(
+            post_id=self.post_id, deleted_datetime__isnull=True
+        ).count()
+
+    @property
+    def comments(self):
+        return Comment.objects.filter(
+            post_id=self.post_id, deleted_datetime__isnull=True
+        )
 
 
 class Like(BaseModel):

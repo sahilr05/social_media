@@ -1,4 +1,5 @@
 import uuid
+from typing import List
 
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import PermissionDenied
@@ -65,6 +66,12 @@ def delete_post(*, user: User, post_id: uuid) -> None:
 
 def post_detail(*, user: User, post_id: uuid) -> None:
     return _get_post(post_id=post_id)
+
+
+def list_post_by_user(*, user: User) -> List[Post]:
+    return Post.objects.filter(user=user, deleted_datetime__isnull=True).order_by(
+        "-created_datetime"
+    )
 
 
 @transaction.atomic
