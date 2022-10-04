@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-# start-server.sh
+#!/bin/sh
 
 # Apply database migrations
 if [ "$DATABASE" = "postgres" ]
