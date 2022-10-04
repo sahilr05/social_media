@@ -17,7 +17,7 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -29,9 +29,15 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "gunicorn",
     "django_extensions",
     "rest_framework",
+    # simple jwt
     "rest_framework_simplejwt",
+    # swagger ui to view all available APIs
+    "rest_framework_swagger",
+    "drf_yasg",
+    # apps
     "social_app",
 ]
 
